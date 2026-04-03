@@ -1,0 +1,39 @@
+{
+  "manifest_version": 2,
+  "name": "Timeify",
+  "version": "1.0",
+
+  "description": "Times your web usage",
+
+  "icons": {
+  },
+
+  "permissions": [
+    "tabs",
+    "storage",
+    "idle",
+    "alarms"
+  ],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "timeify@fdf.org",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["timeify.js"]
+    }
+  ],
+
+  "background": {
+    "scripts": ["background-script.js"],
+    "persistent": false,
+    "type": "module"
+  }
+}
