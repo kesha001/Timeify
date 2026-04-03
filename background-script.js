@@ -1,20 +1,35 @@
-const CHECK_ACTIVITY_PERIOD_IN_MINUTES = 1;
+const CHECK_ACTIVITY_PERIOD_IN_MINUTES = 0.5;
+const CLEAN_ACTIVITY_STORAGE_IN_MINUTES = 0.5;
 
 let storageActivities;
 
+browser.alarms.onAlarm.addListener((e) => console.log("hello alarm"));
 browser.alarms.onAlarm.addListener(handleAlarm);
-browser.alarms.create("checkActivity", {periodInMinutes: CHECK_ACTIVITY_PERIOD_IN_MINUTES});
+
+browser.runtime.onInstalled.addListener(async () => {
+    console.log("intialising");
+
+    const checkActivityAlarm = await browser.alarms.get("checkActivity");
+    if (!checkActivityAlarm){
+        browser.alarms.create("checkActivity", {periodInMinutes: CHECK_ACTIVITY_PERIOD_IN_MINUTES});
+    }
+
+    const cleanActivityStorageAlarm = await browser.alarms.get("cleanActivityStorage");
+    if (!cleanActivityStorageAlarm){
+        browser.alarms.create("cleanActivityStorage", {periodInMinutes: CLEAN_ACTIVITY_STORAGE_IN_MINUTES});
+    }
+});
 
 
 async function handleAlarm(alarmInfo) {
     console.log(`on alarm: ${alarmInfo.name}; ${alarmInfo.periodInMinutes}`);
-    // console.log("updated");
-    if (alarmInfo.name === "checkActivity"){
-        console.log("we passed alarmInfo.name === \"checkActivity\"");
-    
+    if (alarmInfo.name === "checkActivity"){    
         const detectionIntervalInSeconds = 60*CHECK_ACTIVITY_PERIOD_IN_MINUTES;
         let querying = browser.idle.queryState(detectionIntervalInSeconds);
         querying.then(onGot);
+    }
+    if (alarmInfo.name === "cleanActivityStorage"){
+        cleanActivityStorage();
     }
 }
 
@@ -27,7 +42,6 @@ function onGot(newState) {
         console.log("Active state");
     }
 }
-
 
 async function logTabs(tabs) {
     if (tabs.length === 0){
@@ -49,7 +63,7 @@ async function logTabs(tabs) {
 
 
     storageActivities = await browser.storage.local.get("activities");
-    console.log(storageActivities);
+    console.log(JSON.stringify(storageActivities));
 
     const activityStorageIsEmpty = Object.keys(storageActivities).length === 0 && storageActivities.constructor === Object;
     
@@ -76,7 +90,28 @@ const updateActivityTime = async (hostName, timeToAdd) => {
     await browser.storage.local.set(storageActivities);
 }
 
+const cleanActivityStorage = async () => {
+    console.log("Storage is cleaned !");
+    // await browser.storage.local.clean();
+}
+
+
+// does not work with on installed
+
+
+// browser.runtime.onStartup.addListener(() => {
+    
+// })
 
 
 
+// browser.alarms.create("checkActivity", {periodInMinutes: CHECK_ACTIVITY_PERIOD_IN_MINUTES});
+// browser.alarms.create("cleanActivityStorage", {periodInMinutes: CLEAN_ACTIVITY_STORAGE_IN_MINUTES});
+
+// browser.alarms.onAlarm.addListener((e) => console.log("hello alarm"));
+// browser.alarms.onAlarm.addListener(handleAlarm);
+
+// console.log(browser.alarms.onAlarm.hasListener(handleAlarm));
+// console.log(await browser.alarms.getAll());
+    
 
