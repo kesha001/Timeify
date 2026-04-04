@@ -1,5 +1,5 @@
 const CHECK_ACTIVITY_PERIOD_IN_MINUTES = 0.5;
-const CLEAN_ACTIVITY_STORAGE_IN_MINUTES = 0.5;
+const CLEAN_ACTIVITY_STORAGE_IN_MINUTES = 1.5;
 
 let storageActivities;
 
@@ -91,10 +91,42 @@ const updateActivityTime = async (hostName, timeToAdd) => {
 }
 
 const cleanActivityStorage = async () => {
+    // comment out temporary for development
+    // intialiseEmptyActivityStorage();
+    // downloadJSON(storageActivities["activities"], "activites.json")
     console.log("Storage is cleaned !");
-    // await browser.storage.local.clean();
 }
 
+// temporal function to get json data taken from https://www.iditect.com/program-example/javascript--download-json-object-as-a-file-from-browser.html
+// has to be changed with api call
+function downloadJSON(jsonData, filename) {
+  // Convert JSON object to string
+    var jsonString = JSON.stringify(jsonData);
+
+    // Create a new Blob object with the JSON data
+    var blob = new Blob([jsonString], { type: 'application/json' });
+
+    // Create a URL for the Blob object
+    var url = URL.createObjectURL(blob);
+
+    // Create a link element
+    var link = document.createElement('a');
+
+    // Set the download attribute to the filename
+    link.setAttribute('download', filename);
+
+    // Set the href attribute to the URL of the Blob object
+    link.setAttribute('href', url);
+
+    // Append the link to the document body
+    document.body.appendChild(link);
+
+    // Click the link to trigger the download
+    link.click();
+
+    // Remove the link from the document body
+    document.body.removeChild(link);
+}
 
 // does not work with on installed
 
