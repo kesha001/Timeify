@@ -94,7 +94,27 @@ const cleanActivityStorage = async () => {
     // comment out temporary for development
     // intialiseEmptyActivityStorage();
     // downloadJSON(storageActivities["activities"], "activites.json")
+    makeJSONRequest();
     console.log("Storage is cleaned !");
+}
+
+
+const makeJSONRequest = async () => {
+    const requestBody = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ key: 'value' })
+    }
+    fetch('http://localhost:3000/', requestBody)
+    .then(function(response) {
+        return response.text();
+    }).then(function(data) {
+        console.log(data);
+    });
+
+
 }
 
 // temporal function to get json data taken from https://www.iditect.com/program-example/javascript--download-json-object-as-a-file-from-browser.html
