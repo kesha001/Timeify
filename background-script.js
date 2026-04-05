@@ -1,6 +1,8 @@
 const CHECK_ACTIVITY_PERIOD_IN_MINUTES = 0.5;
 const CLEAN_ACTIVITY_STORAGE_IN_MINUTES = 1.5;
 
+const API_POST_URL = "http://localhost:3000/";
+
 let storageActivities;
 
 browser.alarms.onAlarm.addListener((e) => console.log("hello alarm"));
@@ -24,7 +26,7 @@ browser.runtime.onInstalled.addListener(async () => {
 
 browser.runtime.onMessage.addListener(async data => {
   if (data.type === 'get_array') {
-    const _storageActivities = await browser.storage.local.get("activities");
+    const _storageActivities = await getStorageActivities();
     return Promise.resolve(JSON.stringify(_storageActivities["activities"]));
   }
 });
@@ -71,15 +73,15 @@ async function logTabs(tabs) {
     console.log(tabHostName);
 
 
-    storageActivities = await browser.storage.local.get("activities");
+    storageActivities = await getStorageActivities();
     console.log(JSON.stringify(storageActivities));
 
-    const activityStorageIsEmpty = Object.keys(storageActivities).length === 0 && storageActivities.constructor === Object;
+    // const activityStorageIsEmpty = Object.keys(storageActivities).length === 0 && storageActivities.constructor === Object;
     
-    if (activityStorageIsEmpty){
-        console.log("storage is empty!");
-        intialiseEmptyActivityStorage();
-    }
+    // if (activityStorageIsEmpty){
+    //     console.log("storage is empty!");
+    //     intialiseEmptyActivityStorage();
+    // }
 
     updateActivityTime(tabHostName, CHECK_ACTIVITY_PERIOD_IN_MINUTES);
 }
@@ -88,6 +90,8 @@ const intialiseEmptyActivityStorage = async () => {
     const newActivityStorageObj = {};
     newActivityStorageObj["activities"] = {};
     await browser.storage.local.set(newActivityStorageObj);
+
+    return newActivityStorageObj;
 }
 
 const updateActivityTime = async (hostName, timeToAdd) => {
@@ -101,7 +105,7 @@ const updateActivityTime = async (hostName, timeToAdd) => {
 
 const cleanActivityStorage = async () => {
     // comment out temporary for development
-    // intialiseEmptyActivityStorage();
+    intialiseEmptyActivityStorage();
     // downloadJSON(storageActivities["activities"], "activites.json")
     makeJSONRequest();
     console.log("Storage is cleaned !");
@@ -109,14 +113,15 @@ const cleanActivityStorage = async () => {
 
 
 const makeJSONRequest = async () => {
+    const _storageActivities = getStorageActivities();
     const requestBody = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(storageActivities["activities"])
+        body: JSON.stringify(_storageActivities["activities"])
     }
-    fetch('http://localhost:3000/', requestBody)
+    fetch(API_POST_URL, requestBody)
     .then(function(response) {
         return response.text();
     }).then(function(data) {
@@ -124,10 +129,19 @@ const makeJSONRequest = async () => {
     }).catch((error)=>{
         console.log("could not send data");
     });
-
-
 }
 
+const getStorageActivities = async () => {
+    const _storageActivities = await browser.storage.local.get("activities");
+    const activityStorageIsEmpty = Object.keys(_storageActivities).length === 0 && _storageActivities.constructor === Object;
+    
+    if (activityStorageIsEmpty){
+        const newStorageActivities = intialiseEmptyActivityStorage();
+        return newStorageActivities
+    }
+    return _storageActivities;
+}
+ 
 // temporal function to get json data taken from https://www.iditect.com/program-example/javascript--download-json-object-as-a-file-from-browser.html
 // has to be changed with api call
 function downloadJSON(jsonData, filename) {

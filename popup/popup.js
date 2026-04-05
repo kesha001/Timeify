@@ -1,4 +1,4 @@
-document.getElementById("action-btn").addEventListener("click", async () => {
+document.getElementById("show-data-btn").addEventListener("click", async () => {
     console.log("Button clicked inside the popup!");
     const arrayData = await browser.runtime.sendMessage({type: 'get_array'});
 
