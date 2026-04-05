@@ -6,6 +6,7 @@ let storageActivities;
 browser.alarms.onAlarm.addListener((e) => console.log("hello alarm"));
 browser.alarms.onAlarm.addListener(handleAlarm);
 
+
 browser.runtime.onInstalled.addListener(async () => {
     console.log("intialising");
 
@@ -18,6 +19,14 @@ browser.runtime.onInstalled.addListener(async () => {
     if (!cleanActivityStorageAlarm){
         browser.alarms.create("cleanActivityStorage", {periodInMinutes: CLEAN_ACTIVITY_STORAGE_IN_MINUTES});
     }
+});
+
+
+browser.runtime.onMessage.addListener(async data => {
+  if (data.type === 'get_array') {
+    const _storageActivities = await browser.storage.local.get("activities");
+    return Promise.resolve(JSON.stringify(_storageActivities["activities"]));
+  }
 });
 
 
@@ -105,13 +114,15 @@ const makeJSONRequest = async () => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ key: 'value' })
+        body: JSON.stringify(storageActivities["activities"])
     }
     fetch('http://localhost:3000/', requestBody)
     .then(function(response) {
         return response.text();
     }).then(function(data) {
         console.log(data);
+    }).catch((error)=>{
+        console.log("could not send data");
     });
 
 

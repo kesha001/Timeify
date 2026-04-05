@@ -35,5 +35,11 @@
     "scripts": ["background-script.js"],
     "persistent": false,
     "type": "module"
+  },
+
+  "browser_action": {
+    "default_icon": "icons/Time-32x31.png",
+    "default_title": "Timeify",
+    "default_popup": "popup/display_report.html"
   }
 }

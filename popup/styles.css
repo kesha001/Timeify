@@ -1,0 +1,10 @@
+body {
+
+    max-width: 500px;
+    max-height: 200px;
+}
+
+h1 {
+  overflow-wrap: break-word; 
+  word-wrap: break-word;
+}
