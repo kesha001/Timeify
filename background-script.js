@@ -46,9 +46,14 @@ browser.runtime.onMessage.addListener(async data => {
     downloadJSON(_storageActivities["activities"], "activites.json")
     return Promise.resolve(true);
   }
+
+  if (data.type === 'change_api_url'){
+    // TODO: possibly need to check if api is ok, but for now just change
+    console.log("chenged api to " + data.message["new_url"]);
+    
+    API_POST_URL = data.message["new_url"];
+  }
 });
-
-
 
 
 async function handleAlarm(alarmInfo) {
@@ -132,7 +137,9 @@ const cleanActivityStorage = async () => {
 
 
 const makeJSONRequest = async () => {
-    const _storageActivities = getStorageActivities();
+    const _storageActivities = await getStorageActivities();
+    console.log("activities before sending to api");
+
     const requestBody = {
         method: 'POST',
         headers: {

@@ -26,6 +26,25 @@ document.getElementById("download-json-data-btn").addEventListener("click", asyn
     await browser.runtime.sendMessage({type: 'download_json_data'});
 });
 
+document.getElementById("change-api-btn").addEventListener("click", async (event) => {
+
+    event.preventDefault();
+    const newUrl = document.getElementById("new-url-input").value;
+
+    const changeFeedback = document.createElement("p");
+    try {
+        new URL(newUrl);
+        await browser.runtime.sendMessage({type: 'change_api_url', message: {
+            "new_url": newUrl
+        }});
+        changeFeedback.innerText = "Changed!";
+    } catch (error) {
+        console.log(error);
+        changeFeedback.innerText = "Could not change \n" + error;
+    }
+    document.getElementById("new-url-input").after(changeFeedback);
+});
+
 document.addEventListener("DOMContentLoaded", async (event) => {
     const dataElem = document.getElementById("data");
     const API_infoElem = document.createElement("p");
