@@ -1,7 +1,8 @@
 const CHECK_ACTIVITY_PERIOD_IN_MINUTES = 0.5;
 const CLEAN_ACTIVITY_STORAGE_IN_MINUTES = 1.5;
+const SEND_ACTIVITY_STORAGE_IN_MINUTES = CLEAN_ACTIVITY_STORAGE_IN_MINUTES;
 
-const API_POST_URL = "http://localhost:3000/";
+let API_POST_URL = "http://localhost:3000/";
 
 let storageActivities;
 
@@ -25,11 +26,29 @@ browser.runtime.onInstalled.addListener(async () => {
 
 
 browser.runtime.onMessage.addListener(async data => {
-  if (data.type === 'get_array') {
+  if (data.type === 'get_activities') {
     const _storageActivities = await getStorageActivities();
+    // https://discourse.mozilla.org/t/port-communication-between-background-script-and-popup-script/63138/2
+    // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
+    // return a Promise from the event listener, and resolve when you have the response
     return Promise.resolve(JSON.stringify(_storageActivities["activities"]));
   }
+  if (data.type === 'get_api_url') {
+    return Promise.resolve(API_POST_URL);
+  }
+
+  if (data.type === 'get_send_activity_period'){
+    return Promise.resolve(SEND_ACTIVITY_STORAGE_IN_MINUTES);
+  }
+
+  if (data.type === 'download_json_data'){
+    const _storageActivities = await getStorageActivities();
+    downloadJSON(_storageActivities["activities"], "activites.json")
+    return Promise.resolve(true);
+  }
 });
+
+
 
 
 async function handleAlarm(alarmInfo) {
@@ -105,7 +124,7 @@ const updateActivityTime = async (hostName, timeToAdd) => {
 
 const cleanActivityStorage = async () => {
     // comment out temporary for development
-    intialiseEmptyActivityStorage();
+    // intialiseEmptyActivityStorage();
     // downloadJSON(storageActivities["activities"], "activites.json")
     makeJSONRequest();
     console.log("Storage is cleaned !");
