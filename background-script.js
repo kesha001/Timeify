@@ -6,7 +6,6 @@ let API_POST_URL = "http://localhost:3000/";
 
 let storageActivities;
 
-browser.alarms.onAlarm.addListener((e) => console.log("hello alarm"));
 browser.alarms.onAlarm.addListener(handleAlarm);
 
 
@@ -86,10 +85,18 @@ async function logTabs(tabs) {
     // getting url and hostname on the tab
     const tabURL = tab.url;
     const tabURLObj = new URL(tabURL);
+    const tabProtocol = tabURLObj.protocol;
     const tabHostName = tabURLObj.hostname;
+
 
     if (tabHostName === ""){
         console.log("hostname is empty...returning");
+        return;
+    }
+
+    if (tabProtocol !== 'http:' & tabProtocol !== 'https:'){
+        console.log("tabhost is not http, but " + tabProtocol);
+        
         return;
     }
     
@@ -199,22 +206,4 @@ function downloadJSON(jsonData, filename) {
     document.body.removeChild(link);
 }
 
-// does not work with on installed
-
-
-// browser.runtime.onStartup.addListener(() => {
-    
-// })
-
-
-
-// browser.alarms.create("checkActivity", {periodInMinutes: CHECK_ACTIVITY_PERIOD_IN_MINUTES});
-// browser.alarms.create("cleanActivityStorage", {periodInMinutes: CLEAN_ACTIVITY_STORAGE_IN_MINUTES});
-
-// browser.alarms.onAlarm.addListener((e) => console.log("hello alarm"));
-// browser.alarms.onAlarm.addListener(handleAlarm);
-
-// console.log(browser.alarms.onAlarm.hasListener(handleAlarm));
-// console.log(await browser.alarms.getAll());
-    
 

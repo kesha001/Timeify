@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "Timeify",
+  "name": "BATp",
   "version": "1.0",
 
-  "description": "Times your web usage",
+  "description": "Browser Activity Tracker for private usage. Times your web usage",
 
   "icons": {
   },
@@ -17,7 +17,7 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "timeify@fdf.org",
+      "id": "batp@dbnyk.org",
       "data_collection_permissions": {
         "required": ["none"]
       }
@@ -27,7 +27,7 @@
   "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": ["timeify.js"]
+      "js": ["batp.js"]
     }
   ],
 
@@ -39,7 +39,7 @@
 
   "browser_action": {
     "default_icon": "icons/Time-32x31.png",
-    "default_title": "Timeify",
+    "default_title": "BATp",
     "default_popup": "popup/display_report.html"
   }
 }
